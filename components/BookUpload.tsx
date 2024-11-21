@@ -6,8 +6,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Upload, Edit2 } from 'lucide-react'
-import type { Model, UploadedImage, RecognizedBook, ProcessImageResponse } from '@/types'
+import { Upload } from 'lucide-react'
+import type { Model, UploadedImage, RecognizedBook } from '@/types'
 import EditBookDialog from './EditBookDialog'
 
 const models: Model[] = [
@@ -23,6 +23,7 @@ const BookUpload: React.FC = () => {
   const [recognizedBooks, setRecognizedBooks] = useState<RecognizedBook[]>([])
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [isDragActive, setIsDragActive] = useState<boolean>(false)
+  const [processingBooks, setProcessingBooks] = useState<Set<string>>(new Set())
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFiles = (files: FileList) => {
@@ -36,19 +37,16 @@ const BookUpload: React.FC = () => {
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    e.stopPropagation()
     setIsDragActive(true)
   }
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    e.stopPropagation()
     setIsDragActive(false)
   }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    e.stopPropagation()
     setIsDragActive(false)
     
     const files = e.dataTransfer.files
@@ -67,41 +65,43 @@ const BookUpload: React.FC = () => {
   }
 
   const processImages = async () => {
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       const formData = new FormData()
       uploadedImages.forEach(img => formData.append('files', img.file))
       formData.append('model', selectedModel)
-
+  
       const response = await fetch('/api/process-image', {
         method: 'POST',
         body: formData,
       })
-
-      if (!response.ok) throw new Error('Failed to process images')
-
-      const { results } = (await response.json()) as ProcessImageResponse
-      const processed: RecognizedBook[] = uploadedImages.map((img, index) => ({
+  
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to process images')
+  
+      console.log('Response data:', data);
+      
+      if (!data.results) {
+        throw new Error('Invalid response format');
+      }
+  
+      const processed = uploadedImages.map((img, index) => ({
         id: img.id,
         imageUrl: img.preview,
-        ...results[index],
-        isConfirmed: false
-      }))
-      setRecognizedBooks(processed)
+        title: data.results[index].title,
+        author: data.results[index].author,
+        confidence: data.results[index].confidence,
+        isConfirmed: false,
+        modelUsed: selectedModel
+      }));
+  
+      console.log('Processed books:', processed);
+      setRecognizedBooks(processed);
     } catch (error) {
-      console.error('Error processing images:', error)
-      // You might want to add error state and UI here
+      console.error('Processing error:', error);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
-
-  const confirmBook = (id: string) => {
-    setRecognizedBooks(prev =>
-      prev.map(book =>
-        book.id === id ? { ...book, isConfirmed: true } : book
-      )
-    )
   }
 
   const confirmAndSaveBook = async (id: string) => {
@@ -116,7 +116,7 @@ const BookUpload: React.FC = () => {
           title: book.title,
           author: book.author,
           coverImage: book.imageUrl,
-          modelUsed: selectedModel,
+          modelUsed: book.modelUsed,
         }),
       })
   
@@ -130,6 +130,14 @@ const BookUpload: React.FC = () => {
     } catch (error) {
       console.error('Error saving book:', error)
     }
+  }
+
+  const handleBookEdit = (id: string, title: string, author: string) => {
+    setRecognizedBooks(prev =>
+      prev.map(book =>
+        book.id === id ? { ...book, title, author } : book
+      )
+    )
   }
 
   return (
@@ -180,64 +188,56 @@ const BookUpload: React.FC = () => {
       {uploadedImages.length > 0 && (
         <Card className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {uploadedImages.map((image, index) => (
-              <div key={image.id} className="flex space-x-4">
-                <div className="relative w-32 h-48">
-                  <Image
-                    src={image.preview}
-                    alt={`Upload ${index + 1}`}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
+            {uploadedImages.map((image) => {
+              const recognizedBook = recognizedBooks.find(book => book.id === image.id)
+              
+              return (
+                <div key={image.id} className="flex space-x-4">
+                  <div className="relative w-32 h-48">
+                    <Image
+                      src={image.preview}
+                      alt="Book cover"
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+
+                  {recognizedBook ? (
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <Label>Title</Label>
+                        <div className="font-medium">{recognizedBook.title}</div>
+                      </div>
+                      <div>
+                        <Label>Author</Label>
+                        <div className="font-medium">{recognizedBook.author}</div>
+                      </div>
+                      <div className="space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => confirmAndSaveBook(image.id)}
+                          disabled={recognizedBook.isConfirmed}
+                        >
+                          {recognizedBook.isConfirmed ? 'Added to Library' : 'Add to Library'}
+                        </Button>
+                        <EditBookDialog
+                          id={image.id}
+                          currentTitle={recognizedBook.title}
+                          currentAuthor={recognizedBook.author}
+                          onSave={handleBookEdit}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      <p className="text-gray-500">
+                        {processingBooks.has(image.id) ? 'Processing...' : 'Ready for processing'}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {recognizedBooks.find(book => book.id === image.id) ? (
-                  <div className="flex-1 space-y-2">
-                    <div>
-                      <Label>Title</Label>
-                      <div className="font-medium">
-                        {recognizedBooks.find(book => book.id === image.id)?.title}
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Author</Label>
-                      <div className="font-medium">
-                        {recognizedBooks.find(book => book.id === image.id)?.author}
-                      </div>
-                    </div>
-                    <div className="space-x-2">
-                      <Button
-                        size="sm"
-                        onClick={() => confirmBook(image.id)}
-                        disabled={recognizedBooks.find(book => book.id === image.id)?.isConfirmed}
-                      >
-                        {recognizedBooks.find(book => book.id === image.id)?.isConfirmed 
-                          ? 'Confirmed' 
-                          : 'Confirm'}
-                      </Button>
-                      <Button size="sm" variant="outline">
-                      <EditBookDialog
-                        id={image.id}
-                        currentTitle={book.title}
-                        currentAuthor={book.author}
-                        onSave={(id, title, author) => {
-                          setRecognizedBooks(prev =>
-                            prev.map(book =>
-                              book.id === id ? { ...book, title, author } : book
-                            )
-                          )
-                        }}
-                      />
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-gray-500">Ready for processing</p>
-                  </div>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
           <div className="mt-6">
             <Button
@@ -255,4 +255,3 @@ const BookUpload: React.FC = () => {
 }
 
 export default BookUpload
-

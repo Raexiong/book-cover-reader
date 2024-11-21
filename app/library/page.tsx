@@ -3,56 +3,79 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Card } from "@/components/ui/card"
 
-
-
 interface Book {
   id: string
   title: string
   author: string
   coverImage: string
   createdAt: string
+  modelUsed: string
 }
-
 
 export default function LibraryPage() {
   const [books, setBooks] = useState<Book[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const response = await fetch('/api/books')
-      if (response.ok) {
+      try {
+        const response = await fetch('/api/books')
+        if (!response.ok) {
+          throw new Error('Failed to fetch books')
+        }
         const data = await response.json()
+        console.log('Book data:', data) // Add this to check image paths
         setBooks(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load books')
+      } finally {
+        setLoading(false)
       }
     }
     fetchBooks()
   }, [])
 
+  if (loading) {
+    return <div className="text-center p-6">Loading books...</div>
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500 p-6">{error}</div>
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Book Library</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {books.map((book) => (
-          <Card key={book.id} className="overflow-hidden">
-            <div className="relative h-64">
-              <Image
-                src={book.coverImage}
-                alt={book.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <h2 className="text-xl font-semibold mb-2">{book.title}</h2>
-              <p className="text-gray-600">{book.author}</p>
-              <div className="mt-2 text-sm text-gray-500">
-                Added on {new Date(book.createdAt).toLocaleDateString()}
+      {books.length === 0 ? (
+        <div className="text-center text-gray-500 p-6">
+          No books in the library yet
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {books.map((book) => (
+            <Card key={book.id} className="overflow-hidden">
+              <div className="relative h-64">
+                <Image
+                  src={book.coverImage}
+                  alt={book.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+              <div className="p-4">
+                <h2 className="text-xl font-semibold mb-2">{book.title}</h2>
+                <p className="text-gray-600 mb-2">{book.author}</p>
+                <p className="text-sm text-gray-500">Model: {book.modelUsed}</p>
+                <p className="text-sm text-gray-500">
+                  Added on {new Date(book.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

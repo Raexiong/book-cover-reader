@@ -12,15 +12,19 @@ export interface Model {
   
   export interface RecognizedBook {
     id: string
-    imageUrl: string
     title: string
     author: string
+    imageUrl: string
+    confidence?: number
     isConfirmed: boolean
+    modelUsed: string
   }
   
   export interface ProcessImageResponse {
-    results: {
+    results: Array<{
+      id: string
       title: string
       author: string
-    }[]
+      confidence?: number
+    }>
   }
