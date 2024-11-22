@@ -1,14 +1,16 @@
 // app/api/process-image/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { uploadLocally } from '@/lib/upload-utils';
-import { recognizeBookCover } from '@/lib/vision-service';
-import prisma from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { uploadLocally } from "@/lib/upload-utils";
+import { recognizeBookCover } from "@/lib/vision-service";
+import prisma from "@/lib/db";
 
 export async function POST(request: NextRequest) {
+  console.log("POST", request);
+
   try {
     const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
-    const model = formData.get('model') as string;
+    const files = formData.getAll("files") as File[];
+    const model = formData.get("model") as string;
 
     const results = await Promise.all(
       files.map(async (file) => {
@@ -40,14 +42,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ results });
   } catch (error) {
-    console.error('Error processing images:', error);
+    console.error("Error processing images:", error);
     return NextResponse.json(
-      { error: 'Failed to process images' },
+      { error: "Failed to process images" },
       { status: 500 }
     );
   }
 }
-
-
-
-
