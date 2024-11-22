@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBooks, addBook } from "@/lib/storage";
+import { getBooks, addBook, deleteBook } from "@/lib/storage";
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +51,29 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch books" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Book ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await deleteBook(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting book:", error);
+    return NextResponse.json(
+      { error: "Failed to delete book" },
       { status: 500 }
     );
   }

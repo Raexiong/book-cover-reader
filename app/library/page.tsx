@@ -3,30 +3,61 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import type { Book } from "@/types";
 
 export default function LibraryPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingBooks, setDeletingBooks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch("/api/books");
-        if (!response.ok) {
-          throw new Error("Failed to fetch books");
-        }
-        const data = await response.json();
-        setBooks(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load books");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBooks();
   }, []);
+
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch("/api/books");
+      if (!response.ok) {
+        throw new Error("Failed to fetch books");
+      }
+      const data = await response.json();
+      setBooks(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load books");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      // Add book to deleting state
+      setDeletingBooks((prev) => new Set(prev).add(id));
+
+      const response = await fetch(`/api/books?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete book");
+      }
+
+      // Remove book from state
+      setBooks((prev) => prev.filter((book) => book.id !== id));
+    } catch (error) {
+      console.error("Error deleting book:", error);
+    } finally {
+      // Remove book from deleting state
+      setDeletingBooks((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
 
   if (loading) {
     return <div className="text-center p-6">Loading books...</div>;
@@ -57,14 +88,26 @@ export default function LibraryPage() {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{book.title}</h2>
-                <p className="text-slate-600 mb-2">{book.author}</p>
-                <p className="text-sm text-slate-500">
-                  Model: {book.modelUsed}
-                </p>
-                <p className="text-sm text-slate-500">
-                  Added on {new Date(book.createdAt).toLocaleDateString()}
-                </p>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold mb-2">{book.title}</h2>
+                    <p className="text-slate-600 mb-2">{book.author}</p>
+                    <p className="text-sm text-slate-500">
+                      Model: {book.modelUsed}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      Added on {new Date(book.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleDelete(book.id)}
+                    disabled={deletingBooks.has(book.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

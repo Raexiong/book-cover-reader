@@ -1,4 +1,4 @@
-import { writeFile, readFile } from "fs/promises";
+import { writeFile, readFile, unlink } from "fs/promises";
 import path from "path";
 import type { Book } from "@/types";
 
@@ -36,4 +36,34 @@ export async function addBook(
   books.push(newBook);
   await writeFile(DB_PATH, JSON.stringify(books, null, 2), "utf-8");
   return newBook;
+}
+
+// Add new delete function
+export async function deleteBook(id: string): Promise<void> {
+  const books = await getBooks();
+
+  // Find the book to get its image path
+  const bookToDelete = books.find((book) => book.id === id);
+  if (!bookToDelete) {
+    throw new Error("Book not found");
+  }
+
+  // Remove the book from the array
+  const updatedBooks = books.filter((book) => book.id !== id);
+
+  // Update the JSON file
+  await writeFile(DB_PATH, JSON.stringify(updatedBooks, null, 2), "utf-8");
+
+  // Try to delete the image file
+  try {
+    const imagePath = path.join(
+      process.cwd(),
+      "public",
+      bookToDelete.coverImage
+    );
+    await unlink(imagePath);
+  } catch (error) {
+    console.error("Failed to delete image file:", error);
+    // Continue even if image deletion fails
+  }
 }
