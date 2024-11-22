@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ReMo-XYZ: Book Cover Recognition App
 
-## Getting Started
+A Next.js application that allows users to upload book covers and recognize book information using AI models. Users can manage their book library, edit recognized information, and delete books as needed.
 
-First, run the development server:
+## Features
+
+- 📚 Upload and recognize book covers
+- 🤖 Multiple AI model options (mock implementation)
+- 📝 Edit recognized book information
+- 🗃️ View and manage book library
+- 🖼️ Image upload with drag-and-drop support
+- 🎨 Modern UI with Tailwind CSS and shadcn/ui
+
+## Prerequisites
+
+Before you begin, ensure you have installed:
+
+- Node.js 18.17 or later
+- npm (comes with Node.js)
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/remo-xyz.git
+cd remo-xyz
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create required directories:
+
+```bash
+mkdir -p data public/uploads
+```
+
+4. Create initial data file:
+
+```bash
+echo "[]" > data/books.json
+```
+
+## Development
+
+1. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+remo-xyz/
+├── app/                      # Next.js app directory
+│   ├── api/                  # API routes
+│   ├── library/             # Library page
+│   ├── page.tsx             # Home page
+│   └── layout.tsx           # Root layout
+├── components/              # React components
+├── data/                    # JSON data storage
+├── lib/                     # Utility functions
+├── public/                  # Static files
+│   └── uploads/            # Uploaded images
+└── types/                  # TypeScript types
+```
 
-## Learn More
+## Important Notes
 
-To learn more about Next.js, take a look at the following resources:
+- The `data` directory must have write permissions for storing book information
+- The `public/uploads` directory must have write permissions for storing images
+- The current implementation uses mock AI responses for book recognition
+- All data is stored locally in the `data/books.json` file
+- Uploaded images are stored in `public/uploads`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` - Start development server
+- `npm run build` - Build the application
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-## Deploy on Vercel
+## Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Scan Page
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Upload book covers via drag-and-drop or file selection
+- Choose from multiple AI models for recognition
+- Edit recognized information before saving
+- Add books to your library
+
+### Library Page
+
+- View all saved books
+- Delete books from library
+- See book details including cover image, title, author, and date added
+
+## Technical Implementation
+
+- Built with Next.js 14 and TypeScript
+- Uses App Router and Server Components
+- UI components from shadcn/ui
+- Styling with Tailwind CSS
+- Local file storage for images and data
+
+## Customization
+
+You can modify the mock AI models in `app/api/process-image/route.ts` to:
+
+- Add new models
+- Change recognition patterns
+- Adjust response timing
+- Modify confidence scores
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
