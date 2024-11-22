@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { VisionService } from "@/lib/vision-service";
+import path from "path";
 
 // Mock function to simulate AI processing
 function mockRecognition(model: string) {
@@ -49,11 +51,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // The following 4 lines are the working version using mock data
+    // // Simulate processing delay
+    // await new Promise((resolve) => setTimeout(resolve, 1500));
+    // // Get mock recognition results
+    // const result = mockRecognition(model);
 
-    // Get mock recognition results
-    const result = mockRecognition(model);
+    // Get the full path to the image
+    const fullImagePath = path.join(process.cwd(), "public", imagePath);
+    // Get the appropriate handler and process the image
+    const handler = VisionService.getHandler(model);
+    const result = await handler.recognize(fullImagePath);
 
     return NextResponse.json(result);
   } catch (error) {
