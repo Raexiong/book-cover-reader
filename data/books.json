@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Llama - Sample Book Title #336",
+    "author": "John Smith",
+    "coverImage": "/uploads/1732250101162-1.JPG",
+    "modelUsed": "llama",
+    "isConfirmed": true,
+    "id": "wwcrge",
+    "createdAt": "2024-11-22T04:35:07.484Z"
+  },
+  {
+    "title": "Moondream - Sample Book Title #119",
+    "author": "Jane Doe222",
+    "coverImage": "/uploads/1732250211284-1.JPG",
+    "modelUsed": "moondream",
+    "isConfirmed": true,
+    "id": "kr2dd",
+    "createdAt": "2024-11-22T04:37:00.688Z"
+  }
+]
