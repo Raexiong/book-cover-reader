@@ -50,6 +50,7 @@ echo "[]" > data/books.json
 1. Start the development server:
 
 ```bash
+npm install
 npm run dev
 ```
 

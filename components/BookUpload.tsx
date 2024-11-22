@@ -60,7 +60,6 @@ export default function BookUpload() {
         if (!uploadResponse.ok) throw new Error("Failed to upload image");
 
         const { filePath } = await uploadResponse.json();
-
         // Process image with selected model
         const processResponse = await fetch("/api/process-image", {
           method: "POST",
@@ -70,7 +69,6 @@ export default function BookUpload() {
             model: selectedModel,
           }),
         });
-
         if (!processResponse.ok) throw new Error("Failed to process image");
 
         const result = await processResponse.json();
