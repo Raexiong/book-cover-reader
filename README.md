@@ -56,6 +56,17 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Usage
+
+To use the `Llama3.2-vision` model, download and install [Ollama](https://ollama.com/download). Then run
+
+```
+ollama pull llama3.2-vision
+ollama serve
+```
+
+After that you can use the model in your browser by click `Process Images`. Be patient while processing :)
+
 ## Project Structure
 
 ```

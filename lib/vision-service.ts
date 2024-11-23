@@ -7,6 +7,7 @@ import {
   Moondream1ForConditionalGeneration,
   RawImage,
 } from "@huggingface/transformers";
+import { Ollama } from "ollama";
 
 // Response type for all model handlers
 interface RecognitionResult {
@@ -214,16 +215,56 @@ class MoondreamHandler extends ModelHandler {
 
 // Llama Handler
 class LlamaHandler extends ModelHandler {
+  private client: Ollama;
+
   constructor() {
     super();
+    this.client = new Ollama({ host: "http://127.0.0.1:11434" });
+  }
+
+  private cleanJsonResponse(content: string): string {
+    // Remove markdown code blocks if present
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    return jsonMatch ? jsonMatch[0] : "{}";
   }
 
   async recognize(imagePath: string): Promise<RecognitionResult> {
-    return {
-      title: "Llama - Unknown Title",
-      author: "Llama - Unknown Author",
-      confidence: 0.9,
-    };
+    try {
+      // Read the image and convert to base64
+      const imageBuffer = await fs.readFile(imagePath);
+      const base64Image = imageBuffer.toString("base64");
+
+      const response = await this.client.chat({
+        model: "llama3.2-vision",
+        messages: [
+          {
+            role: "user",
+            content:
+              'This is a book cover. Please identify the book title and author. Return ONLY a JSON response in the format: {"title": "Book Title", "author": "Author Name"} without any markdown formatting.',
+            images: [base64Image],
+          },
+        ],
+      });
+
+      // Claude returns the response in the content array
+      const content = response.message.content || "{}";
+
+      // Clean the response before parsing
+      const cleanedContent = this.cleanJsonResponse(content);
+
+      console.log("Raw Llama response:", content); // For debugging
+      console.log("Cleaned Llama response:", cleanedContent); // For debugging
+
+      const result = JSON.parse(cleanedContent);
+      return {
+        title: result.title || "Unknown Title",
+        author: result.author || "Unknown Author",
+        confidence: 0.9,
+      };
+    } catch (error) {
+      console.error("Llama processing error:", error);
+      throw error;
+    }
   }
 }
 
