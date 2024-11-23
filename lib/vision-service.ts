@@ -1,7 +1,13 @@
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
-import axios from "axios";
 import fs from "fs/promises";
+import {
+  AutoProcessor,
+  AutoTokenizer,
+  Moondream1ForConditionalGeneration,
+  RawImage,
+} from "@huggingface/transformers";
+import { Ollama } from "ollama";
 
 // Response type for all model handlers
 interface RecognitionResult {
@@ -149,7 +155,56 @@ class ClaudeHandler extends ModelHandler {
 
 // Moondream Handler
 class MoondreamHandler extends ModelHandler {
+  constructor() {
+    super();
+  }
+
   async recognize(imagePath: string): Promise<RecognitionResult> {
+    console.log("moondream", imagePath);
+
+    try {
+      // Load processor, tokenizer and model
+      const model_id = "Xenova/moondream2";
+      const processor = await AutoProcessor.from_pretrained(model_id);
+      const tokenizer = await AutoTokenizer.from_pretrained(model_id);
+      const model = await Moondream1ForConditionalGeneration.from_pretrained(
+        model_id,
+        {
+          dtype: {
+            embed_tokens: "fp16", // or 'fp32'
+            vision_encoder: "fp16", // or 'q8'
+            decoder_model_merged: "q4", // or 'q4f16' or 'q8'
+          },
+          device: "auto",
+        }
+      );
+
+      // Prepare text inputs
+      const prompt =
+        'This is a book cover. Please identify the book title and author. Return ONLY a JSON response in the format: {"title": "Book Title", "author": "Author Name"} without any markdown formatting.';
+      const text = `<image>\n\nQuestion: ${prompt}\n\nAnswer:`;
+      const text_inputs = tokenizer(text);
+
+      // Prepare vision inputs
+      const image = await RawImage.read(imagePath);
+      const vision_inputs = await processor(image);
+
+      // Generate response
+      const output = await model.generate({
+        ...text_inputs,
+        ...vision_inputs,
+        do_sample: false,
+        max_new_tokens: 64,
+      });
+      const decoded = tokenizer.batch_decode(output, {
+        skip_special_tokens: false,
+      });
+
+      console.log("decoded", decoded);
+    } catch (error) {
+      console.error("Moondream processing error:", error);
+      throw error;
+    }
     return {
       title: "Moondream - Unknown Title",
       author: "Moondream - Unknown Author",
@@ -160,12 +215,56 @@ class MoondreamHandler extends ModelHandler {
 
 // Llama Handler
 class LlamaHandler extends ModelHandler {
+  private client: Ollama;
+
+  constructor() {
+    super();
+    this.client = new Ollama({ host: "http://127.0.0.1:11434" });
+  }
+
+  private cleanJsonResponse(content: string): string {
+    // Remove markdown code blocks if present
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    return jsonMatch ? jsonMatch[0] : "{}";
+  }
+
   async recognize(imagePath: string): Promise<RecognitionResult> {
-    return {
-      title: "Llama - Unknown Title",
-      author: "Llama - Unknown Author",
-      confidence: 0.9,
-    };
+    try {
+      // Read the image and convert to base64
+      const imageBuffer = await fs.readFile(imagePath);
+      const base64Image = imageBuffer.toString("base64");
+
+      const response = await this.client.chat({
+        model: "llama3.2-vision",
+        messages: [
+          {
+            role: "user",
+            content:
+              'This is a book cover. Please identify the book title and author. Return ONLY a JSON response in the format: {"title": "Book Title", "author": "Author Name"} without any markdown formatting.',
+            images: [base64Image],
+          },
+        ],
+      });
+
+      // Claude returns the response in the content array
+      const content = response.message.content || "{}";
+
+      // Clean the response before parsing
+      const cleanedContent = this.cleanJsonResponse(content);
+
+      console.log("Raw Llama response:", content); // For debugging
+      console.log("Cleaned Llama response:", cleanedContent); // For debugging
+
+      const result = JSON.parse(cleanedContent);
+      return {
+        title: result.title || "Unknown Title",
+        author: result.author || "Unknown Author",
+        confidence: 0.9,
+      };
+    } catch (error) {
+      console.error("Llama processing error:", error);
+      throw error;
+    }
   }
 }
 
