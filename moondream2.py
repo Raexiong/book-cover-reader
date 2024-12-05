@@ -8,7 +8,7 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
-image = Image.open("/Users/ZongyuWu/CS5330/Final/Images")
+image = Image.open("/Users/raexiong/Desktop/1.JPG")
 enc_image = model.encode_image(image)
 print(
     model.answer_question(

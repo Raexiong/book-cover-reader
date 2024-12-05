@@ -23,8 +23,8 @@ Before you begin, ensure you have installed:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/remo-xyz.git
-cd remo-xyz
+git clone https://github.com/Raexiong/book-cover-scanner.git
+cd book-cover-scanner
 ```
 
 2. Install dependencies:
@@ -36,13 +36,23 @@ npm install
 3. Create required directories:
 
 ```bash
-mkdir -p data public/uploads
+mkdir public/uploads
 ```
 
-4. Create initial data file:
+## Model Setup
 
-```bash
-echo "[]" > data/books.json
+1. To use the ‘Claude API’ and ‘OpenAI API’, create a .env.local file. Then store your own API keys in the file:
+
+```
+OPENAI_API_KEY=""
+ANTHROPIC_API_KEY=""
+```
+
+2. To use the `Llama3.2-vision` model, download and install [Ollama](https://ollama.com/download). Then run
+
+```
+ollama pull llama3.2-vision
+ollama serve
 ```
 
 ## Development
@@ -50,22 +60,12 @@ echo "[]" > data/books.json
 1. Start the development server:
 
 ```bash
-npm install
 npm run dev
 ```
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Usage
-
-To use the `Llama3.2-vision` model, download and install [Ollama](https://ollama.com/download). Then run
-
-```
-ollama pull llama3.2-vision
-ollama serve
-```
-
-After that you can use the model in your browser by click `Process Images`. Be patient while processing :)
+Now you can use the model in your browser by click `Process Images`. Be patient while processing :)
 
 ## Project Structure
 
