@@ -147,21 +147,6 @@ class ClaudeHandler extends ModelHandler {
   }
 }
 
-// Moondream Handler
-class MoondreamHandler extends ModelHandler {
-  constructor() {
-    super();
-  }
-
-  async recognize(imagePath: string): Promise<RecognitionResult> {
-    return {
-      title: "Moondream - Unknown Title",
-      author: "Moondream - Unknown Author",
-      confidence: 0.9,
-    };
-  }
-}
-
 // Llama Handler
 class LlamaHandler extends ModelHandler {
   private client: Ollama;
@@ -222,7 +207,6 @@ export class VisionService {
   private static handlers: { [key: string]: ModelHandler } = {
     openai: new OpenAIHandler(),
     claude: new ClaudeHandler(),
-    moondream: new MoondreamHandler(),
     llama: new LlamaHandler(),
   };
 

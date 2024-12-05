@@ -16,11 +16,7 @@ const models: Model[] = [
     name: "Llama3.2-vision",
     description: "Meta's vision-language model",
   },
-  {
-    id: "moondream",
-    name: "Moondream2",
-    description: "Lightweight vision-language model",
-  },
+
   { id: "claude", name: "Claude API", description: "Anthropic's vision model" },
   { id: "openai", name: "OpenAI API", description: "GPT-4 Vision model" },
 ];
