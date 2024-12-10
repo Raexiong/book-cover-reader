@@ -67,23 +67,6 @@ npm run dev
 
 Now you can use the model in your browser by click `Process Images`. Be patient while processing :)
 
-## Project Structure
-
-```
-remo-xyz/
-├── app/                      # Next.js app directory
-│   ├── api/                  # API routes
-│   ├── library/             # Library page
-│   ├── page.tsx             # Home page
-│   └── layout.tsx           # Root layout
-├── components/              # React components
-├── data/                    # JSON data storage
-├── lib/                     # Utility functions
-├── public/                  # Static files
-│   └── uploads/            # Uploaded images
-└── types/                  # TypeScript types
-```
-
 ## Important Notes
 
 - The `data` directory must have write permissions for storing book information
@@ -124,20 +107,9 @@ remo-xyz/
 
 ## Customization
 
-You can modify the mock AI models in `app/api/process-image/route.ts` to:
+You can modify the mock AI models in `lib/vision-service.ts` to:
 
 - Add new models
-- Change recognition patterns
-- Adjust response timing
-- Modify confidence scores
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
