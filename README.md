@@ -13,7 +13,7 @@ A Next.js application that allows users to upload book covers and recognize book
 
 ## Pipeline
 
-![Alt text]( https://github.com/Raexiong/book-cover-scanner/blob/c6e96cdc55ddacfbd2df403cefc0891c62fbdda9/flowchart.png)
+![Alt text](https://github.com/Raexiong/book-cover-scanner/blob/7c37adfa80eea73458c30bebfd42654795a09df0/flowchart.png)
 
 ## Prerequisites
 
