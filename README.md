@@ -11,6 +11,10 @@ A Next.js application that allows users to upload book covers and recognize book
 - 🖼️ Image upload with drag-and-drop support
 - 🎨 Modern UI with Tailwind CSS and shadcn/ui
 
+## Pipeline
+
+![Alt text]( https://github.com/Raexiong/book-cover-scanner/blob/c6e96cdc55ddacfbd2df403cefc0891c62fbdda9/flowchart.png)
+
 ## Prerequisites
 
 Before you begin, ensure you have installed:
