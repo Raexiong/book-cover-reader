@@ -2,11 +2,11 @@
 
 A Next.js application that allows users to upload book covers and recognize book information using AI models. Users can manage their book library, edit recognized information, and delete books as needed.
 
-## Contact information
+## Contact information of group members
 
 <ul>
   <li>Zongyu Wu, wu.zongyu@northeastern.edu, zongyuwu97@gmail.com</li>
-  <li>Zican Hao, hao.zic@northeastern.edu, [LinkedIn](www.linkedin.com/in/zican-hao-1469a42a3)</li>
+  <li>Zican Hao, hao.zic@northeastern.edu, LinkedIn profile: https://www.linkedin.com/in/zican-hao-1469a42a3 </li>
 </ul>
 
 ## Features
