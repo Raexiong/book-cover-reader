@@ -4,8 +4,10 @@ A Next.js application that allows users to upload book covers and recognize book
 
 ## Contact information
 
-Zongyu Wu, wu.zongyu@northeastern.edu, zongyuwu97@gmail.com
-Zican Hao, hao.zic@northeastern.edu, <www.linkedin.com/in/zican-hao-1469a42a3>
+<ol>
+  <li>Zongyu Wu, wu.zongyu@northeastern.edu, zongyuwu97@gmail.com<li>
+  <li>Zican Hao, hao.zic@northeastern.edu, <www.linkedin.com/in/zican-hao-1469a42a3><li>
+<ol>
 
 ## Features
 
