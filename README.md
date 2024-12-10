@@ -1,13 +1,13 @@
 # ReMo-XYZ: Book Cover Recognition App
 
 A Next.js application that allows users to upload book covers and recognize book information using AI models. Users can manage their book library, edit recognized information, and delete books as needed.
+![Alt text](./public/UI.png)
 
 ## Contact information
 
-<ul>
-  <li>Zongyu Wu, wu.zongyu@northeastern.edu, zongyuwu97@gmail.com</li>
-  <li>Zican Hao, hao.zic@northeastern.edu, LinkedIn profile: https://www.linkedin.com/in/zican-hao-1469a42a3 </li>
-</ul>
+- Rae Xiong, xiong.ru@northeastern.edu, [LinkedIn Profile](https://www.linkedin.com/in/rae-xiong-300700227/)</li>
+- Zongyu Wu, wu.zongyu@northeastern.edu, zongyuwu97@gmail.com</li>
+- Zican Hao, hao.zic@northeastern.edu, LinkedIn profile: https://www.linkedin.com/in/zican-hao-1469a42a3 </li>
 
 ## Features
 
